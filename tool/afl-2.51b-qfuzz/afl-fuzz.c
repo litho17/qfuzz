@@ -2628,11 +2628,16 @@ static void init_costs_file() {
   } else {
     fprintf(costs_file, "Time(sec)%c File%c Time%c Memory%c Instr.%c User-Defined\n", SEPARATOR, SEPARATOR, SEPARATOR, SEPARATOR, SEPARATOR);
   }
+  fclose(costs_file);
 }
 
 // Append resource usage to output file.
 static void append_resource_use_to_file(u64 current_time, u8* fname, u64 time, u64 memory, u64 instr_cost, u64 user_defined_cost) {
+  char path[strlen(out_dir)+strlen(COSTS_FILE_NAME)+2];
+  snprintf(path, sizeof path, "%s/%s", out_dir, COSTS_FILE_NAME);
+  costs_file = fopen(path, "ab");
   fprintf(costs_file, "%llu%c %s%c %llu%c %llu%c %llu%c %llu\n", current_time, SEPARATOR, fname, SEPARATOR, time, SEPARATOR, memory, SEPARATOR, instr_cost, SEPARATOR, user_defined_cost);
+  fclose(costs_file);
 }
 
 static void append_resource_use_to_file_quantify(u64 current_time, u8* fname, u32 number_of_partitions, double min_delta_value, double partition_values[]) {
@@ -2655,7 +2660,11 @@ static void append_resource_use_to_file_quantify(u64 current_time, u8* fname, u3
   }
   free(partition_value);
 
+  char path[strlen(out_dir)+strlen(COSTS_FILE_NAME)+2];
+  snprintf(path, sizeof path, "%s/%s", out_dir, COSTS_FILE_NAME);
+  costs_file = fopen(path, "ab");
   fprintf(costs_file, "%llu%c %s%c %d%c %.2lf%c [%s]\n", current_time, SEPARATOR, fname, SEPARATOR, number_of_partitions, SEPARATOR, min_delta_value, SEPARATOR, converted_partition_values);
+  fclose(costs_file);
 
   if (number_of_partitions > 0) {
     free(converted_partition_values);
